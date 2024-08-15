@@ -181,6 +181,7 @@ function FieldSettingsEdit({attributes, setAttributes, fieldSettings, clientId})
                                     label={__('Display in Admin', 'give')}
                                     checked={attributes.displayInAdmin}
                                     onChange={() => setAttributes({displayInAdmin: !attributes.displayInAdmin})}
+                                    help={__('If enabled, this field will be displayed in the admin donation details.', 'give-form-field-manager')}
                                 />
                             </PanelRow>
                         )}
@@ -190,6 +191,7 @@ function FieldSettingsEdit({attributes, setAttributes, fieldSettings, clientId})
                                     label={__('Display in Receipt', 'give')}
                                     checked={attributes.displayInReceipt}
                                     onChange={() => setAttributes({displayInReceipt: !attributes.displayInReceipt})}
+                                    help={__('If enabled, this field will be displayed on the donation confirmation page.', 'give-form-field-manager')}
                                 />
                             </PanelRow>
                         )}
