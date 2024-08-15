@@ -1,4 +1,6 @@
 .dateField {
+
+
     :global {
         .react-datepicker-wrapper {
             width: 100%;
@@ -27,6 +29,20 @@
                 }
             }
         }
+    }
+}
+
+.phoneField, .dateFieldInputContainer {
+    position: relative;
+
+    * {
+        margin-bottom: 0;
+    }
+
+    svg {
+        position: absolute;
+        bottom: .85rem;
+        right: 1.25rem;
     }
 }
 
