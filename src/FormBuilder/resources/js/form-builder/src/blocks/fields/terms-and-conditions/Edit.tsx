@@ -119,6 +119,7 @@ export default function Edit({
                                         label={__('URL', 'give')}
                                         value={linkUrl}
                                         onChange={(value) => setAttributes({linkUrl: value})}
+                                        help={__('Required: Enter the URL where users can view the terms & conditions.', 'give')}
                                     />
                                 </PanelRow>
                             )}
