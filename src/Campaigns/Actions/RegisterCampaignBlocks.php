@@ -45,5 +45,6 @@ class RegisterCampaignBlocks
             ['wp-components'],
             $scriptAsset['version']
         );
+        wp_enqueue_style('givewp-design-system-foundation');
     }
 }
