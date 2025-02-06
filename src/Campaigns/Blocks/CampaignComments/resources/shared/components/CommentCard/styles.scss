@@ -1,0 +1,84 @@
+.givewp-campaign-comment-block {
+    font-family: Inter, serif;
+    display: flex;
+    flex-direction: column;
+    gap: var(--givewp-spacing-2);
+    padding: var(--givewp-spacing-6) 0;
+    background-color: var(--givewp-shades-white);
+
+    &__title {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.56;
+        text-align: left;
+        color: var(--givewp-neutral-900);
+    }
+
+    &__card {
+        display: flex;
+        gap: var(--givewp-spacing-3);
+        padding: var(--givewp-spacing-4) 0;
+    }
+
+    &__avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        border-radius: 50%;
+        background-color: var(--givewp-blue-25);
+    }
+
+    &__donor-name {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.5;
+        text-align: left;
+        color: var(--givewp-neutral-700);
+
+    }
+
+    &__details {
+        display: flex;
+        gap: var(--givewp-spacing-2);
+        align-items: center;
+        height: 20px;
+        margin: 2px 0 var(--givewp-spacing-3) 0;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.43;
+        text-align: left;
+        color: var(--givewp-neutral-400);
+    }
+
+    &__ellipse {
+        display: inline-block;
+        width: 4px;
+        height: 4px;
+        background-color: var(--givewp-neutral-100);
+        border-radius: 50%;
+    }
+
+    &__comment {
+        min-height: 40px;
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.5;
+        text-align: left;
+        color: var(--givewp-neutral-700);
+    }
+
+    &__read-more {
+        font-size: 14px;
+        padding: 0;
+        background: none;
+        color: var(--givewp-blue-500);
+        line-height: 1.43;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+}
