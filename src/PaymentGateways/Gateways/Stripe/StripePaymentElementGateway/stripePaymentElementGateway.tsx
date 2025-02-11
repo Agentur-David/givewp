@@ -5,10 +5,10 @@ import {
     StripeElementsOptionsMode,
     StripePaymentElementChangeEvent,
 } from '@stripe/stripe-js';
-import {Elements, PaymentElement, useElements, useStripe} from '@stripe/react-stripe-js';
-import {applyFilters} from '@wordpress/hooks';
-import type {Gateway, GatewaySettings} from '@givewp/forms/types';
-import {__, sprintf} from '@wordpress/i18n';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { applyFilters } from '@wordpress/hooks';
+import type { Gateway, GatewaySettings } from '@givewp/forms/types';
+import { __, sprintf } from '@wordpress/i18n';
 
 let stripePromise = null;
 let stripePaymentMethod = null;
@@ -47,7 +47,7 @@ const dollarsToCents = (amount: string, currency: string) => {
     return Math.round(parseFloat(amount) * 100);
 };
 
-const StripeFields = ({gateway}) => {
+const StripeFields = ({ gateway }) => {
     const stripe = useStripe();
     const elements = useElements();
 
@@ -62,6 +62,7 @@ const StripeFields = ({gateway}) => {
         <PaymentElement
             onChange={handleOnChange}
             options={{
+                paymentMethodOrder: ['ideal', 'sepa_debit', 'card'],
                 fields: {
                     billingDetails: {
                         name: 'never',
@@ -70,8 +71,10 @@ const StripeFields = ({gateway}) => {
                 },
                 layout: {
                     type: 'accordion',
+                    defaultCollapsed: false,
+                    radios: true,
+                    spacedAccordionItems: true
                 },
-                paymentMethodOrder: ['ideal', 'sepa_debit', 'card'],
             }}
         />
     );
@@ -103,13 +106,30 @@ interface StripeGateway extends Gateway {
 const stripePaymentElementGateway: StripeGateway = {
     id: 'stripe_payment_element',
     initialize() {
-        const {stripeKey, stripeConnectedAccountId, formId} = this.settings;
+        const { stripeKey, stripeConnectedAccountId, formId } = this.settings;
 
         if (!stripeKey && !stripeConnectedAccountId) {
             throw new Error('Stripe gateway settings are missing.  Check your Stripe settings.');
         }
 
-        appearanceOptions = applyFilters('givewp_stripe_payment_element_appearance_options', {}, formId) as object;
+        appearanceOptions = applyFilters('givewp_stripe_payment_element_appearance_options', {
+            theme: 'stripe', // Basis-Theme
+            variables: {
+                colorPrimary: '#14374F',
+                colorBackground: '#ffffff',
+                borderRadius: '4px'
+            },
+            rules: {
+                '.AccordionItem': {
+                    border: '1px solid #e0e0e0',
+                    marginBottom: '8px',
+                    padding: '12px'
+                },
+                '.AccordionItem--selected': {
+                    borderColor: '#14374F'
+                }
+            }
+        }, formId) as object;
 
         /**
          * Create the Stripe object and pass our api keys
@@ -119,8 +139,8 @@ const stripePaymentElementGateway: StripeGateway = {
             stripeKey,
             stripeConnectedAccountId
                 ? {
-                      stripeAccount: stripeConnectedAccountId,
-                  }
+                    stripeAccount: stripeConnectedAccountId,
+                }
                 : {}
         );
     },
@@ -132,7 +152,7 @@ const stripePaymentElementGateway: StripeGateway = {
         }
 
         // Trigger form validation and wallet collection
-        const {error: submitError} = await this.elements.submit();
+        const { error: submitError } = await this.elements.submit();
 
         if (submitError) {
             let errorMessage = __('Invalid Payment Data.', 'give');
@@ -176,7 +196,7 @@ const stripePaymentElementGateway: StripeGateway = {
             };
         };
     }): Promise<void> {
-        const {error} = await this.stripe.confirmPayment({
+        const { error } = await this.stripe.confirmPayment({
             elements: this.elements,
             clientSecret: response.data.clientSecret,
             confirmParams: {
@@ -204,10 +224,10 @@ const stripePaymentElementGateway: StripeGateway = {
             throw new Error('Stripe library was not able to load.  Check your Stripe settings.');
         }
 
-        const {useWatch} = window.givewp.form.hooks;
-        const donationType = useWatch({name: 'donationType'});
-        const donationCurrency = useWatch({name: 'currency'});
-        const donationAmount = useWatch({name: 'amount'});
+        const { useWatch } = window.givewp.form.hooks;
+        const donationType = useWatch({ name: 'donationType' });
+        const donationCurrency = useWatch({ name: 'currency' });
+        const donationAmount = useWatch({ name: 'amount' });
         const stripeAmount = dollarsToCents(donationAmount, donationCurrency.toString().toUpperCase());
 
         const stripeElementOptions: StripeElementsOptionsMode = {
