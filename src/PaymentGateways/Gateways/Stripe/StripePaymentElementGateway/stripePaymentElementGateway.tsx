@@ -98,6 +98,7 @@ interface StripeGateway extends Gateway {
 }
 
 /**
+ * @since 4.2.0 Replace useWatch with useFormData
  * @since 3.18.0 added fields conditional when donation amount is zero
  * @since 3.13.0 Use only stripeKey to load the Stripe script (when stripeConnectedAccountId is missing) to prevent errors when the account is connected through API keys
  * @since 3.12.1 updated afterCreatePayment response type to include billing details address
@@ -231,13 +232,13 @@ const stripePaymentElementGateway: StripeGateway = {
         const stripeAmount = dollarsToCents(donationAmount, donationCurrency.toString().toUpperCase());
 
         const stripeElementOptions: StripeElementsOptionsMode = {
-            mode: donationType === 'subscription' ? 'subscription' : 'payment',
+            mode: isRecurring ? 'subscription' : 'payment',
             amount: stripeAmount,
-            currency: donationCurrency.toLowerCase(),
+            currency: currency.toLowerCase(),
             appearance: appearanceOptions,
         };
 
-        if (donationAmount <= 0) {
+        if (stripeAmount <= 0) {
             return <>{__('Donation amount must be greater than zero to proceed.', 'give')}</>;
         }
 

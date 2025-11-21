@@ -2,9 +2,11 @@
 
 namespace Give\FormBuilder\ViewModels;
 
+use Give\Campaigns\Models\Campaign;
 use Give\DonationForms\Actions\GenerateDonationFormPreviewRouteUrl;
 use Give\DonationForms\Models\DonationForm;
 use Give\DonationForms\ValueObjects\GoalProgressType;
+use Give\DonationForms\ValueObjects\GoalSource;
 use Give\DonationForms\ValueObjects\GoalType;
 use Give\Donations\Models\Donation;
 use Give\Donations\ValueObjects\DonationMetaKeys;
@@ -18,6 +20,7 @@ use Give\Framework\PaymentGateways\PaymentGateway;
 use Give\Framework\Support\Facades\Scripts\ScriptAsset;
 use Give\Helpers\IntlTelInput;
 use Give\Subscriptions\Models\Subscription;
+use Give_License;
 
 class FormBuilderViewModel
 {
@@ -66,6 +69,7 @@ class FormBuilderViewModel
             ],
             'formFieldManagerData' => [
                 'isInstalled' => defined('GIVE_FFM_VERSION'),
+                'isLicensed' => (Give_License::get_license_by_plugin_dirname('give-form-field-manager')['license'] ?? '') === 'valid',
             ],
             'emailTemplateTags' => $this->getEmailTemplateTags(),
             'emailNotifications' => array_map(static function ($notification) {
@@ -80,10 +84,13 @@ class FormBuilderViewModel
                 'agreementText' => give_get_option('agreement_text'),
             ],
             'goalTypeOptions' => $this->getGoalTypeOptions(),
+            'goalSourceOptions' => $this->getGoalSourceOptions(),
             'goalProgressOptions' => $this->getGoalProgressOptions(),
             'nameTitlePrefixes' => give_get_option('title_prefixes', array_values(give_get_default_title_prefixes())),
             'isExcerptEnabled' => give_is_setting_enabled(give_get_option('forms_excerpt')),
             'intlTelInputSettings' => IntlTelInput::getSettings(),
+            'campaignColors' => $this->getCampaignColors($donationFormId),
+            'showFormGoalNotice' => !get_user_meta(get_current_user_id(), 'givewp_campaign_form_goal_notice', true),
         ];
     }
 
@@ -112,6 +119,24 @@ class FormBuilderViewModel
             'isCurrency' => $isCurrency,
         ];
     }
+
+
+    /**
+     * @since 4.1.0
+     */
+    public function getGoalSourceOption(
+        string $value,
+        string $label,
+        string $description
+    ): array
+    {
+        return [
+            'value' => $value,
+            'label' => $label,
+            'description' => $description,
+        ];
+    }
+
 
     /**
      * @since 3.12.0
@@ -176,6 +201,25 @@ class FormBuilderViewModel
         }
 
         return $options;
+    }
+
+    /**
+     * @since 4.1.0
+     */
+    public function getGoalSourceOptions(): array
+    {
+        return [
+            $this->getGoalTypeOption(
+                GoalSource::CAMPAIGN,
+                __('Campaign', 'give'),
+                __('The goal for this form will automatically adjust according to the campaign goal. Change campaign goal.', 'give')
+            ),
+            $this->getGoalTypeOption(
+                GoalSource::FORM,
+                __('Custom', 'give'),
+                __('Set the custom goal for this form', 'give')
+            ),
+        ];
     }
 
     /**
@@ -318,6 +362,7 @@ class FormBuilderViewModel
      * as not to be too confusing. This array is used to prevent the user from creating meta keys that conflict with the
      * existing meta or field names.
      *
+     * @since 4.3.2 Add country, state, city, zip, address1, and address2 to the disallowed field names.
      * @since 3.0.0
      */
     protected function getDisallowedFieldNames(): array
@@ -333,9 +378,36 @@ class FormBuilderViewModel
                 'login',
                 'consent',
                 'donation-summary',
+                'country',
+                'state',
+                'city',
+                'zip',
+                'address1',
+                'address2',
             ]
         );
 
         return array_values(array_unique($disallowedFieldNames));
+    }
+
+    /**
+     * @since 4.1.0
+     */
+    private function getCampaignColors(int $formId): array
+    {
+        /** @var Campaign $campaign */
+        $campaign = give()->campaigns->getByFormId($formId);
+
+        if ($campaign) {
+            return [
+                'primaryColor' => $campaign->primaryColor,
+                'secondaryColor' => $campaign->secondaryColor,
+            ];
+        }
+
+        return [
+            'primaryColor' => '',
+            'secondaryColor' => '',
+        ];
     }
 }
