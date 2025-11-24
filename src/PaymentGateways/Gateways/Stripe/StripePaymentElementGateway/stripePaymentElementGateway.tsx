@@ -225,11 +225,7 @@ const stripePaymentElementGateway: StripeGateway = {
             throw new Error('Stripe library was not able to load.  Check your Stripe settings.');
         }
 
-        const { useWatch } = window.givewp.form.hooks;
-        const donationType = useWatch({ name: 'donationType' });
-        const donationCurrency = useWatch({ name: 'currency' });
-        const donationAmount = useWatch({ name: 'amount' });
-        const stripeAmount = dollarsToCents(donationAmount, donationCurrency.toString().toUpperCase());
+        const {isRecurring, currency, amountInMinorUnits: stripeAmount} = window.givewp.form.hooks.useFormData();
 
         const stripeElementOptions: StripeElementsOptionsMode = {
             mode: isRecurring ? 'subscription' : 'payment',
@@ -237,6 +233,7 @@ const stripePaymentElementGateway: StripeGateway = {
             currency: currency.toLowerCase(),
             appearance: appearanceOptions,
         };
+
 
         if (stripeAmount <= 0) {
             return <>{__('Donation amount must be greater than zero to proceed.', 'give')}</>;
